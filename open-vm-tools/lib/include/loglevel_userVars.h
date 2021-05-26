@@ -1,5 +1,5 @@
 /*********************************************************
- * Copyright (C) 1998-2020 VMware, Inc. All rights reserved.
+ * Copyright (C) 1998-2021 VMware, Inc. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -65,8 +65,12 @@
    LOGLEVEL_VAR(crtbora),  /* apps/crtbora */ \
    LOGLEVEL_VAR(cui), \
    LOGLEVEL_VAR(dataCache), \
+   LOGLEVEL_VAR(dataSetsMgr), \
+   LOGLEVEL_VAR(dataSetsStore),\
    LOGLEVEL_VAR(device), \
+   LOGLEVEL_VAR(deviceGroup), \
    LOGLEVEL_VAR(devicePowerOn), \
+   LOGLEVEL_VAR(deviceSwap), \
    LOGLEVEL_VAR(deviceThread), \
    LOGLEVEL_VAR(dict), \
    LOGLEVEL_VAR(digestlib), \
@@ -157,6 +161,7 @@
    LOGLEVEL_VAR(mksCursorPosition), \
    LOGLEVEL_VAR(mksDX11Window), \
    LOGLEVEL_VAR(mksDX11Renderer), \
+   LOGLEVEL_VAR(mksDX11Basic), \
    LOGLEVEL_VAR(mksDX11ResourceView), \
    LOGLEVEL_VAR(mksDX11ShimOps), \
    LOGLEVEL_VAR(mksFrame), \
@@ -179,6 +184,7 @@
    LOGLEVEL_VAR(mksServer), \
    LOGLEVEL_VAR(mksSWB), \
    LOGLEVEL_VAR(mksVulkanRenderer), \
+   LOGLEVEL_VAR(mksVulkanCmds), \
    LOGLEVEL_VAR(mksWinBSOD), \
    LOGLEVEL_VAR(mor), \
    LOGLEVEL_VAR(mstat), \
@@ -194,6 +200,7 @@
    LOGLEVEL_VAR(objc), /* lib/objc */ \
    LOGLEVEL_VAR(objlib), \
    LOGLEVEL_VAR(oemDevice), \
+   LOGLEVEL_VAR(opNotification), \
    LOGLEVEL_VAR(oprom), \
    LOGLEVEL_VAR(ovhdmem), \
    LOGLEVEL_VAR(parallel), \
@@ -232,6 +239,7 @@
    LOGLEVEL_VAR(serviceUser), /* lib/serviceUser */ \
    LOGLEVEL_VAR(sg), /* lib/sg */ \
    LOGLEVEL_VAR(sgx), \
+   LOGLEVEL_VAR(sgxmpa), \
    LOGLEVEL_VAR(sgxRegistrationTool), \
    LOGLEVEL_VAR(shader), \
    LOGLEVEL_VAR(sharedFolderMgr),  /* mks/remote/vdpFolderSharedMgrVmdb */ \

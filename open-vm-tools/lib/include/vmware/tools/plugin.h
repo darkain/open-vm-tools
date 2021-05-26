@@ -217,15 +217,6 @@ ToolsCore_LogState(guint level,
  */
 #define TOOLS_CORE_SIG_SERVICE_CONTROL  "tcs_service_control"
 
-/**
- * Signal sent when a new version of global configuration is downloaded.
- *
- * @param[in]  src      The source object.
- * @param[in]  ctx      ToolsAppCtx *: The application context.
- * @param[in]  data     Client data.
- */
-#define TOOLS_CORE_SIG_GLOBALCONF_UPDATE "tcs_globalconf_update"
-
 #endif
 
 /**
@@ -236,6 +227,14 @@ ToolsCore_LogState(guint level,
  * in the callback for the object's "notify" signal.
  */
 #define TOOLS_CORE_PROP_CTX "tcs_app_ctx"
+
+/**
+ * Event signaled when VMTools discovers a newer version is available.
+ *
+ * Name of the event that can be set to the notification event to
+ * indicate a new version of tools is available for install or upgrade.
+ */
+#define TOOLS_CORE_EVENTS_TOOLS_NEW_VERSION "VMToolsNewVersion"
 
 /**
  * Event signaled when VMTools requires a system restart to complete an install.

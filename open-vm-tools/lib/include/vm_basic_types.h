@@ -1,5 +1,5 @@
 /*********************************************************
- * Copyright (C) 1998-2020 VMware, Inc. All rights reserved.
+ * Copyright (C) 1998-2021 VMware, Inc. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -78,12 +78,24 @@
 #include "includeCheck.h"
 
 /*
- * Macros __i386__ and __ia64 are intrinsically defined by GCC
+ * Standardize MSVC arch macros to GCC arch macros.
  */
 #if defined _MSC_VER && defined _M_X64
-#  define __x86_64__
+#  define __x86_64__ 1
 #elif defined _MSC_VER && defined _M_IX86
-#  define __i386__
+#  define __i386__ 1
+#elif defined _MSC_VER && defined _M_ARM64
+#  define __aarch64__ 1
+#elif defined _MSC_VER && defined _M_ARM
+#  define __arm__ 1
+#endif
+
+/*
+ * Apple/Darwin uses __arm64__, but defines the more standard
+ * __aarch64__ too. Code below assumes __aarch64__.
+ */
+#if defined __arm64__ && !defined __aarch64__
+#  error Unexpected: defined __arm64__ without __aarch64__
 #endif
 
 /*
@@ -132,6 +144,25 @@
 #define VM_64BIT
 #else
 #define vm_arm_64 0
+#endif
+
+#ifdef VM_ARM_ANY
+#define vm_arm_any 1
+#else
+#define vm_arm_any 0
+#endif
+
+#ifdef VM_X86_ANY
+#define vm_x86_any 1
+#else
+#define vm_x86_any 0
+#endif
+
+#if defined(__APPLE__) && defined(VM_ARM_64)
+#define VM_MAC_ARM
+#define vm_mac_arm 1
+#else
+#define vm_mac_arm 0
 #endif
 
 #define vm_64bit (sizeof (void *) == 8)
@@ -397,12 +428,6 @@ typedef int64 VmTimeVirtualClock;  /* Virtual Clock kept in CPU cycles */
  * Suffix for 64-bit constants.  Use it like this:
  *    CONST64(0x7fffffffffffffff) for signed or
  *    CONST64U(0x7fffffffffffffff) for unsigned.
- *
- * 2004.08.30(thutt):
- *   The vmcore/asm64/gen* programs are compiled as 32-bit
- *   applications, but must handle 64 bit constants.  If the
- *   64-bit-constant defining macros are already defined, the
- *   definition will not be overwritten.
  */
 
 #if !defined(CONST64) || !defined(CONST64U)
@@ -501,6 +526,7 @@ typedef uint64    PageNum;
 typedef unsigned  MemHandle;
 typedef unsigned  IoHandle;
 typedef int32     World_ID;
+typedef uint64    VSCSI_HandleID;
 
 /* !! do not alter the definition of INVALID_WORLD_ID without ensuring
  * that the values defined in both bora/public/vm_basic_types.h and
@@ -538,8 +564,9 @@ typedef  int128  Reg128;
 typedef uint128 UReg128;
 #endif
 
-#if defined(VMM) || defined(COREQUERY) || defined(EXTDECODER) ||  \
-    defined (VMKERNEL) || defined (VMKBOOT) || defined (ULM)
+#if (defined(VMM) || defined(COREQUERY) || defined(EXTDECODER) ||  \
+     defined (VMKERNEL) || defined (VMKBOOT) || defined (ULM)) &&  \
+    !defined (FROBOS)
 typedef  Reg64  Reg;
 typedef UReg64 UReg;
 #endif
@@ -730,19 +757,20 @@ typedef void * UserVA;
 
 /*
  * At present, we effectively require a compiler that is at least
- * gcc-4.1 (circa 2006).  Enforce this here, various things below
+ * gcc-4.4 (circa 2009).  Enforce this here, various things below
  * this line depend upon it.
  *
  * Current oldest compilers:
- * - guest tools: 4.1.2 (freebsd/solaris)
  * - buildhost compiler: 4.4.3
  * - hosted kernel modules: 4.5
+ * - widespread usage: 4.8
  *
  * SWIG's preprocessor is exempt.
+ * clang pretends to be gcc (4.2.1 by default), so needs to be excluded.
  */
-#ifndef SWIG
-#if defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))
-#error "gcc version is too old, need gcc-4.1 or better"
+#if !defined __clang__ && !defined SWIG
+#if defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 4))
+#error "gcc version is too old, need gcc-4.4 or better"
 #endif
 #endif
 
@@ -839,7 +867,7 @@ typedef void * UserVA;
  *    Note that there is no annotation for "neither."
  */
 
-#if defined __GNUC__ && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
+#if defined __GNUC__
 #define HOT __attribute__((hot))
 #define COLD __attribute__((cold))
 #else

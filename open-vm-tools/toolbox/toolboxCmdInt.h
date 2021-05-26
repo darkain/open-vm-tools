@@ -1,5 +1,5 @@
 /*********************************************************
- * Copyright (C) 2008-2020 VMware, Inc. All rights reserved.
+ * Copyright (C) 2008-2021 VMware, Inc. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -37,6 +37,10 @@
 #   include <getopt.h>
 #   include <sysexits.h>
 #   include <unistd.h>
+#endif
+
+#if defined(_WIN32) || (defined(__linux__) && !defined(USERWORLD))
+#include "globalConfig.h"
 #endif
 
 #include "vmGuestLib.h"
@@ -149,6 +153,31 @@ DECLARE_COMMAND(Config);
 #if defined(_WIN32) || \
    (defined(__linux__) && !defined(OPEN_VM_TOOLS) && !defined(USERWORLD))
 DECLARE_COMMAND(Upgrade);
+#endif
+
+#if defined(_WIN32) || \
+   (defined(__linux__) && !defined(USERWORLD))
+DECLARE_COMMAND(GuestStore);
+#endif
+
+#if defined(GLOBALCONFIG_SUPPORTED)
+
+DECLARE_COMMAND(GlobalConf)
+
+#define TOOLBOXCMD_LOAD_GLOBALCONFIG(conf)                        \
+   {                                                              \
+      if (GlobalConfig_GetEnabled(conf)) {                        \
+         GKeyFile *__globalConf = NULL;                           \
+         if (GlobalConfig_LoadConfig(&__globalConf, NULL)) {      \
+            VMTools_AddConfig(__globalConf, conf);                \
+            g_key_file_free(__globalConf);                        \
+         }                                                        \
+      }                                                           \
+   }
+#else
+
+#define TOOLBOXCMD_LOAD_GLOBALCONFIG(conf)
+
 #endif
 
 #endif /*_TOOLBOX_CMD_H_*/
